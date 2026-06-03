@@ -7,7 +7,7 @@
 
 ## Commands run
 
-All commands executed independently from `/Users/gopalpatwa/opt/stash-seed`
+All commands executed independently from the repo root
 after `git checkout slice/bulk-delete`. Each step run separately so failures
 do not mask one another.
 
