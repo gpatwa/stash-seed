@@ -1,0 +1,13 @@
+{
+  "name": "stash-seed",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "description": "Minimal runnable seed repo for a live Agentic SDLC multi-agent run.",
+  "scripts": {
+    "typecheck": "for f in src/services/*.js; do node --check \"$f\" || exit 1; done; echo \"typecheck ok\"",
+    "test": "node --test",
+    "build": "node -e \"Promise.all([import('./src/services/savedItems.js'),import('./src/services/audit.js')]).then(()=>console.log('build ok')).catch(e=>{console.error(e);process.exit(1)})\"",
+    "qa:mvp": "npm run typecheck && npm run test"
+  }
+}

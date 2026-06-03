@@ -1,0 +1,17 @@
+# Safety Invariants — Stash (seed)
+
+These MUST hold across releases. A slice may not weaken them without
+explicit human approval.
+
+1. **Deletes are soft and recoverable.** Deleting sets `deletedAt`; the
+   record is retained, not removed.
+2. **Destructive multi-item actions are confirmed.** Any action removing
+   more than one item in one gesture requires a confirmation that states
+   the count. (In this headless seed, "confirmation" = the bulk API
+   requires an explicit list of IDs; it never deletes by a broad filter.)
+3. **Every delete is audited.** Each deletion (single or bulk) emits an
+   append-only audit event.
+4. **No item content in logs.** Logs/audit metadata may carry item IDs and
+   counts — never the saved content.
+5. **A user only ever affects their own items.** Every operation is scoped
+   by `userId`; another user's IDs are rejected, never deleted.
