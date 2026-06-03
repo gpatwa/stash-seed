@@ -1,7 +1,7 @@
 # Live Multi-Agent Run — Plan
 
 This repo is the target for a **live** run of the Agentic SDLC playbook
-(`../agentic-sdlc-playbook`). Real role-agents, each loaded only with their
+(https://github.com/gpatwa/agentic-sdlc-playbook). Real role-agents, each loaded only with their
 brief + this repo's `.agentic/` + the prior stage's artefact, implement a
 real feature on this codebase and pass it through the gates.
 
