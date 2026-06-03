@@ -32,6 +32,45 @@ export function softDeleteItem(userId, itemId) {
   return true;
 }
 
+/**
+ * Soft-delete an explicit list of items for a user.
+ * Delegates each deletion to softDeleteItem; emits one summary
+ * `items.bulk_deleted` audit event after processing.
+ *
+ * @param {string}   userId
+ * @param {string[]} itemIds  Must be a non-empty array of explicit IDs.
+ * @returns {{ deleted: string[], skipped: string[] }}
+ */
+export function bulkDeleteItems(userId, itemIds) {
+  if (typeof userId !== "string" || userId.length === 0) {
+    throw new TypeError("userId required");
+  }
+  if (!Array.isArray(itemIds) || itemIds.length === 0) {
+    throw new TypeError("itemIds must be a non-empty array");
+  }
+
+  const deleted = [];
+  const skipped = [];
+
+  for (const id of itemIds) {
+    if (softDeleteItem(userId, id)) {
+      deleted.push(id);
+    } else {
+      skipped.push(id);
+    }
+  }
+
+  recordAuditEvent(userId, "items.bulk_deleted", {
+    requestedCount: itemIds.length,
+    deletedCount: deleted.length,
+    skippedCount: skipped.length,
+    deletedIds: deleted,
+    skippedIds: skipped,
+  });
+
+  return { deleted, skipped };
+}
+
 /** Test/inspection helper — read an item regardless of deletedAt. */
 export function _getItem(itemId) {
   return items.get(itemId);

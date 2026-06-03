@@ -4,6 +4,7 @@ import {
   addItem,
   listItems,
   softDeleteItem,
+  bulkDeleteItems,
   _getItem,
   _reset as resetItems,
 } from "../src/services/savedItems.js";
@@ -39,4 +40,171 @@ test("cannot delete another user's item", () => {
   const a = addItem("u1", "x");
   assert.equal(softDeleteItem("u2", a), false);
   assert.equal(listItems("u1").length, 1);
+});
+
+// ── bulkDeleteItems tests ──────────────────────────────────────────────────
+
+// Case 1: Happy path — all IDs owned by user
+test("bulkDeleteItems: happy path — all IDs owned by user", () => {
+  resetItems();
+  resetAudit();
+  const id1 = addItem("u1", "a");
+  const id2 = addItem("u1", "b");
+
+  const result = bulkDeleteItems("u1", [id1, id2]);
+
+  assert.deepEqual(result.deleted, [id1, id2]);
+  assert.deepEqual(result.skipped, []);
+  assert.ok(_getItem(id1).deletedAt !== null);
+  assert.ok(_getItem(id2).deletedAt !== null);
+  assert.equal(listItems("u1").length, 0);
+
+  const events = listAuditEvents("u1");
+  // two individual items.deleted + one items.bulk_deleted
+  const deletedEvents = events.filter((e) => e.type === "items.deleted");
+  const bulkEvents = events.filter((e) => e.type === "items.bulk_deleted");
+  assert.equal(deletedEvents.length, 2);
+  assert.equal(bulkEvents.length, 1);
+  assert.equal(bulkEvents[0].metadata.requestedCount, 2);
+  assert.equal(bulkEvents[0].metadata.deletedCount, 2);
+  assert.equal(bulkEvents[0].metadata.skippedCount, 0);
+});
+
+// Case 2: Partial match — mix of own and other-user IDs
+test("bulkDeleteItems: partial match — own IDs deleted, other-user IDs skipped", () => {
+  resetItems();
+  resetAudit();
+  const ownId = addItem("u1", "mine");
+  const otherId = addItem("u2", "theirs");
+
+  const result = bulkDeleteItems("u1", [ownId, otherId]);
+
+  assert.deepEqual(result.deleted, [ownId]);
+  assert.deepEqual(result.skipped, [otherId]);
+  // other user's item is untouched
+  assert.equal(_getItem(otherId).deletedAt, null);
+});
+
+// Case 3: Already-deleted ID in list
+test("bulkDeleteItems: already-deleted ID lands in skipped, no duplicate audit event", () => {
+  resetItems();
+  resetAudit();
+  const id = addItem("u1", "x");
+  softDeleteItem("u1", id); // delete first
+  resetAudit(); // clear prior events so counts are clean
+
+  const result = bulkDeleteItems("u1", [id]);
+
+  assert.deepEqual(result.deleted, []);
+  assert.deepEqual(result.skipped, [id]);
+
+  const bulkEvents = listAuditEvents("u1").filter(
+    (e) => e.type === "items.bulk_deleted",
+  );
+  assert.equal(bulkEvents.length, 1);
+  assert.equal(bulkEvents[0].metadata.deletedCount, 0);
+  assert.equal(bulkEvents[0].metadata.skippedCount, 1);
+  // no extra items.deleted event was emitted
+  const deletedEvents = listAuditEvents("u1").filter(
+    (e) => e.type === "items.deleted",
+  );
+  assert.equal(deletedEvents.length, 0);
+});
+
+// Case 4: All IDs unknown
+test("bulkDeleteItems: all IDs unknown — returns empty deleted, one bulk event", () => {
+  resetItems();
+  resetAudit();
+
+  const result = bulkDeleteItems("u1", ["ghost1", "ghost2"]);
+
+  assert.deepEqual(result.deleted, []);
+  assert.deepEqual(result.skipped, ["ghost1", "ghost2"]);
+
+  const bulkEvents = listAuditEvents("u1").filter(
+    (e) => e.type === "items.bulk_deleted",
+  );
+  assert.equal(bulkEvents.length, 1);
+  assert.equal(bulkEvents[0].metadata.deletedCount, 0);
+});
+
+// Case 5: Guard — empty array
+test("bulkDeleteItems: guard — empty array throws TypeError, no mutation, no audit", () => {
+  resetItems();
+  resetAudit();
+  const id = addItem("u1", "x");
+
+  assert.throws(() => bulkDeleteItems("u1", []), TypeError);
+  // no mutation
+  assert.equal(_getItem(id).deletedAt, null);
+  // no audit event
+  assert.equal(listAuditEvents("u1").length, 0);
+});
+
+// Case 6: Guard — missing userId
+test("bulkDeleteItems: guard — missing userId throws TypeError, no mutation, no audit", () => {
+  resetItems();
+  resetAudit();
+  const id = addItem("u1", "x");
+
+  assert.throws(() => bulkDeleteItems("", [id]), TypeError);
+  assert.throws(() => bulkDeleteItems(null, [id]), TypeError);
+  assert.equal(_getItem(id).deletedAt, null);
+  assert.equal(listAuditEvents("u1").length, 0);
+});
+
+// Case 7: User isolation — cross-user call never deletes foreign item
+test("bulkDeleteItems: user isolation — u2 cannot delete u1's item", () => {
+  resetItems();
+  resetAudit();
+  const id = addItem("u1", "private");
+
+  const result = bulkDeleteItems("u2", [id]);
+
+  assert.deepEqual(result.skipped, [id]);
+  assert.deepEqual(result.deleted, []);
+  assert.equal(_getItem(id).deletedAt, null, "u1 item must remain un-deleted");
+});
+
+// Case 8: Audit payload shape — no content field
+test("bulkDeleteItems: audit payload shape — contains counts/IDs, not content", () => {
+  resetItems();
+  resetAudit();
+  const id1 = addItem("u1", "secret content");
+  const id2 = addItem("u1", "more secrets");
+  // make id2 a skipped one
+  const badId = "not-an-item";
+
+  bulkDeleteItems("u1", [id1, badId]);
+
+  const bulkEvent = listAuditEvents("u1").find(
+    (e) => e.type === "items.bulk_deleted",
+  );
+  assert.ok(bulkEvent, "bulk event must exist");
+  const meta = bulkEvent.metadata;
+  assert.ok("requestedCount" in meta);
+  assert.ok("deletedCount" in meta);
+  assert.ok("skippedCount" in meta);
+  assert.ok("deletedIds" in meta);
+  assert.ok("skippedIds" in meta);
+  assert.ok(!("content" in meta), "content must never appear in audit metadata");
+});
+
+// Case 9: Single-item list — behaves identically to softDeleteItem
+test("bulkDeleteItems: single-item list behaves like softDeleteItem", () => {
+  resetItems();
+  resetAudit();
+  const id = addItem("u1", "solo");
+
+  const result = bulkDeleteItems("u1", [id]);
+
+  assert.deepEqual(result.deleted, [id]);
+  assert.deepEqual(result.skipped, []);
+  assert.ok(_getItem(id).deletedAt !== null);
+  assert.equal(listItems("u1").length, 0);
+
+  const events = listAuditEvents("u1");
+  const types = events.map((e) => e.type);
+  assert.ok(types.includes("items.deleted"));
+  assert.ok(types.includes("items.bulk_deleted"));
 });
