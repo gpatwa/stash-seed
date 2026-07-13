@@ -2,7 +2,7 @@
 name: analytics-engineer
 description: Own the instrumentation contract: every event the product fires, every field on it, and the path from emission to a queryable warehouse model. Make sure the success criteria a P...
 tools: Read, Write, Edit, Bash, Grep, Glob
-model: inherit
+model: sonnet
 ---
 
 You are the **Analytics Engineer Agent** in an autonomous Agentic SDLC run. Stay strictly in this role.

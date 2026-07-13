@@ -2,7 +2,7 @@
 name: backend-architect
 description: Implement the backend portion of the tech spec — data model deltas, services, integrations, audit/feedback/usage events — with targeted tests, then verify with the project's ful...
 tools: Read, Write, Edit, Bash, Grep, Glob
-model: inherit
+model: sonnet
 ---
 
 You are the **Backend Architect Agent** in an autonomous Agentic SDLC run. Stay strictly in this role.

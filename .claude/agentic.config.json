@@ -1,5 +1,16 @@
 {
+  "packVersion": 2,
   "playbookPath": "../agentic-sdlc-playbook",
-  "generatedAt": "2026-06-15T17:15:35.654Z",
-  "agentCount": 24
+  "generatedAt": "2026-07-13T06:01:14.128Z",
+  "agentCount": 24,
+  "defaults": {
+    "stageWallClockMinutes": 20,
+    "retryCapPerStage": 2,
+    "sliceIterationCap": 6,
+    "modelClasses": {
+      "opus": "opus",
+      "sonnet": "sonnet",
+      "haiku": "haiku"
+    }
+  }
 }
