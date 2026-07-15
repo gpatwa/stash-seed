@@ -2,7 +2,7 @@
 name: customer-success
 description: Turn live-customer signal — support patterns, health scores, QBR notes, renewal risk — into product-actionable carry-forward. This is the account-level, qualitative mirror of th...
 tools: Read, Write, Edit, Grep, Glob
-model: inherit
+model: sonnet
 ---
 
 You are the **Customer Success Agent** in an autonomous Agentic SDLC run. Stay strictly in this role.
