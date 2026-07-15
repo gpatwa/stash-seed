@@ -3,9 +3,9 @@
 - **Ask:** Email users a digest of their saved items.
 - **Project pack:** b2c-saas
 - **Release tier:** 3
-- **Current stage:** Release
-- **Status:** in-progress — awaiting human merge
-- **Started:** 2026-06-15T17:20Z  ·  **Updated:** 2026-07-13T06:22Z
+- **Current stage:** Post-Launch
+- **Status:** done
+- **Started:** 2026-06-15T17:20Z  ·  **Updated:** 2026-07-15T00:20Z
 
 ## Stages
 
@@ -18,7 +18,7 @@
 | QA | QA Evidence | done | runs/email-digest/04-qa-evidence.md | — |
 | Security | Security & Privacy | done | runs/email-digest/05-security-review.md | — |
 | Release | Release Manager | done | runs/email-digest/06-release-checklist.md | GO |
-| Post-Launch | Post-Launch Learning | pending (runs after landing) | — | — |
+| Post-Launch | Post-Launch Learning | done | runs/email-digest/07-post-launch.md | — |
 
 ## Approvals
 
@@ -48,7 +48,8 @@ harness usage stats after each stage.
 | QA | sonnet | 2026-07-13T06:30Z | 2026-07-13T06:35Z | 5:10 | 95,907 | 36 | 0 |
 | Security | opus | 2026-07-13T06:36Z | 2026-07-13T06:40Z | 4:24 | 70,034 | 17 | 0 |
 | Release | opus | 2026-07-13T06:41Z | 2026-07-13T06:47Z | 5:39 | 88,046 | 18 | 0 |
-| **Total (6 spawned stages)** | 3 sonnet / 3 opus | | | ~36 min | **504,352** | 143 | 0 |
+| Post-Launch (after human merge, PR #2) | sonnet | 2026-07-13T06:50Z | 2026-07-13T06:57Z | 6:43 | 124,794 | 31 | 0 |
+| **Total (7 spawned stages)** | 4 sonnet / 3 opus | | | ~43 min | **629,146** | 174 | 0 |
 
 **SLO check (`.claude/protocols/PIPELINE_SLOS.md`):** stage wall-clock p95
 8:11 ✓ (≤20:00); approval surfaced at Intake ✓; zero retries ✓; **Tier-3
@@ -60,12 +61,4 @@ no silent loosening.
 
 ## Next action
 
-Release gate cleared: **GO** (runs/email-digest/06-release-checklist.md).
-The **human merges** branch `slice/email-digest` to `main` via PR — the
-merge is a rule-3 deploy-adjacent action performed by the human, not the
-run; the run does not merge, push, or deploy. After the merge lands, the
-Post-Launch Learning Agent runs (watching the audit signals in the
-checklist: `items.digest_sent` must never appear in this build; any
-unexpected `items.digest_send_attempted` warrants review). Preconditions
-P-1..P-6 carry forward to the deferred rule-6 (real email provider) slice;
-the rule-6 approval remains not-yet-requested.
+Slice complete. Rule-6 slice deferred pending human request + approval.
