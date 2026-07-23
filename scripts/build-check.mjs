@@ -1,0 +1,15 @@
+// Build check: every shipped module must import cleanly. The repo is
+// dependency-free, so "build" = prove each module loads without a runtime
+// error (server.js is import-safe: it only listens when run directly).
+const modules = [
+  "../src/services/savedItems.js",
+  "../src/services/audit.js",
+  "../src/services/emailAdapter.js",
+  "../src/services/digest.js",
+  "../src/server.js",
+];
+
+for (const m of modules) {
+  await import(new URL(m, import.meta.url));
+}
+console.log("build ok");
