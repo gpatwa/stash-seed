@@ -1,0 +1,37 @@
+# Gates as code — the Agentic SDLC release gates, enforced.
+# Each step is one gate from .agentic/LOCAL_COMMANDS.md; a red step blocks
+# the merge (once branch protection requires this check). Honor-system ->
+# enforced. Dependency-free: no install step (the repo has no dependencies).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  gates:
+    name: Release gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Typecheck gate
+        run: npm run typecheck
+
+      - name: Test gate
+        run: npm test
+
+      - name: Build gate
+        run: npm run build
+
+      - name: QA regression gate (qa:mvp)
+        run: npm run qa:mvp
