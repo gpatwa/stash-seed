@@ -3,7 +3,7 @@
 - **Ask:** Give users an AI-generated summary of their saved items.
 - **Project pack:** b2c-saas (with AI overlay roles)
 - **Release tier:** 2 (deterministic-first build; real model would be Tier 3)
-- **Current stage:** Implementation
+- **Current stage:** AI risk
 - **Status:** in-progress
 - **Started:** 2026-07-24T00:00Z  ·  **Updated:** 2026-07-24T00:12Z
 
@@ -13,7 +13,7 @@
 |-------|-------|--------|----------|------|
 | Intake | Orchestrator | done | runs/llm-summary/00-slice-plan.md | n/a |
 | Scope | Engineering Manager | done | runs/llm-summary/01-em-scope.md | — |
-| Implementation | AI Engineer | in-progress | — | — |
+| Implementation | AI Engineer | done | runs/llm-summary/02-impl-notes.md | — |
 | AI risk | AI Governance | pending | — | — |
 | Cost | FinOps | pending | — | — |
 | QA | QA Evidence | pending | — | — |
@@ -44,10 +44,12 @@ Security / Release = opus (`.claude/protocols/MODEL_ROUTING.md`).
 |-------|-------|-------------|-----------|------|--------|------------|---------|
 | Intake (paused for approval) | fable (driving) | 2026-07-24T00:00Z | 2026-07-24T00:10Z | interrupt held | n/a | n/a | 0 |
 | Scope (EM) | fable (driving) | 2026-07-24T00:11Z | 2026-07-24T00:12Z | ~1m | n/a | n/a | 0 |
+| Implementation (AI Engineer) | sonnet | 2026-07-24T00:13Z | 2026-07-24T00:22Z | ~9m | n/a | n/a | 0 |
 
 ## Next action
 
-AI Engineer (Implementation): build `summarizeItems` deterministic-first per
-01-em-scope.md — DeterministicSummarizer default + throwing
-PlaceholderLlmSummarizer + evals; run gates; commit; then AI Governance +
-FinOps assess, then QA → Security → Release.
+AI Governance (AI risk) + FinOps (Cost): assess the shipped `summary.js`
+capability — risk tier per `AI_RISK_ASSESSMENT_TEMPLATE.md`, token
+cost-per-summary + kill-switch per `COST_BUDGET_TEMPLATE.md` (even though no
+real model is wired yet) — per `01-em-scope.md`'s gate map. Then
+QA → Security → Release.
