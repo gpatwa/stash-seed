@@ -35,3 +35,6 @@ jobs:
 
       - name: QA regression gate (qa:mvp)
         run: npm run qa:mvp
+
+      - name: Deploy smoke + rollback drill
+        run: npm run rollback:drill
