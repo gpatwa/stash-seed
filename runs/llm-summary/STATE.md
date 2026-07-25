@@ -44,7 +44,7 @@ Security / Release = opus (`.claude/protocols/MODEL_ROUTING.md`).
 |-------|-------|-------------|-----------|------|--------|------------|---------|
 | Intake (paused for approval) | fable (driving) | 2026-07-24T00:00Z | 2026-07-24T00:10Z | interrupt held | n/a | n/a | 0 |
 | Scope (EM) | fable (driving) | 2026-07-24T00:11Z | 2026-07-24T00:12Z | ~1m | n/a | n/a | 0 |
-| Implementation (AI Engineer) | sonnet | 2026-07-24T00:13Z | 2026-07-24T00:22Z | ~9m | n/a | n/a | 0 |
+| Implementation (AI Engineer) | sonnet | 2026-07-24T00:13Z | 2026-07-24T00:22Z | 9:01 | 117,247 | 46 | 0 |
 
 ## Next action
 
