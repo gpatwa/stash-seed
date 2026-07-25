@@ -12,7 +12,7 @@
 | File | Purpose |
 |------|---------|
 | `src/services/summary.js` | `SummarizerAdapter` typedef + `DeterministicSummarizer` (default, always works) + `PlaceholderLlmSummarizer` (always throws) + `summarizeItems(userId, adapter?)` orchestration |
-| `test/summary.test.js` | 20 tests: happy paths (6), the 6 required safety-invariant EVAL cases, a guard case |
+| `test/summary.test.js` | 14 tests: happy paths, the 6 required safety-invariant EVAL cases, and guard cases |
 | `scripts/build-check.mjs` | +1 line: added `"../src/services/summary.js"` to the import-check `modules` array (explicitly permitted by the brief; nothing else in the file touched) |
 
 `src/services/savedItems.js` and `src/services/audit.js` — reused as-is, **not modified** (confirmed by `git diff --stat`, see below).
