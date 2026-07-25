@@ -3,9 +3,9 @@
 - **Ask:** Give users an AI-generated summary of their saved items.
 - **Project pack:** b2c-saas (with AI overlay roles)
 - **Release tier:** 2 (deterministic-first build; real model would be Tier 3)
-- **Current stage:** Release
-- **Status:** in-progress — awaiting human merge
-- **Started:** 2026-07-24T00:00Z  ·  **Updated:** 2026-07-24T18:43Z
+- **Current stage:** Landed (merged to main)
+- **Status:** done — PR #5 merged to `main` (`53ccf31`, 2026-07-25T23:19Z)
+- **Started:** 2026-07-24T00:00Z  ·  **Updated:** 2026-07-25T23:25Z
 
 ## Stages
 
@@ -69,15 +69,26 @@ FinOps stage's token use. No silent loosening. (The run also survived an
 account usage-limit interruption mid-chain and resumed cleanly from this
 file — an incidental validation of the resumable-state machinery.)
 
-## Next action
+> **Post-launch update (2026-07-25):** carry-forward actioned. The token SLO was
+> re-baselined to a per-stage model (`PIPELINE_SLOS.md`): per-stage cap ≤ 150k +
+> slice envelope = stages × 100k. Under it, this slice's five non-FinOps stages
+> (487k, 97.5k-avg) are textbook-typical; the overage is isolated to FinOps
+> (396k), root-caused as analytical over-production for a $0-live slice (10 tool
+> calls — not file I/O). Follow-up: a scope guardrail for `agents/finops.md`.
+> The re-baseline pairs the looser-shaped envelope with a *stricter* per-stage
+> cap, so it surfaces FinOps rather than burying it under a slice-total pass —
+> not silent loosening.
 
-**Human merges branch `slice/llm-summary` into `main` via PR** — this is the
-rule-3 deploy-adjacent action and stays with the human; the run does not merge,
-push, or deploy. Release Manager decision: **Tier 2 · GO**
-(`runs/llm-summary/07-release-checklist.md`) — all gates pass or n/a-with-reason,
-rule-5 approval verified and scope-matched (shipped diff = deterministic-first +
-throwing placeholder only; no real model / network / keys), rollback confirmed
-executable. On merge, hand off to the Post-Launch Learning Agent. The seven
+## Outcome
+
+**Merged.** The human merged `slice/llm-summary` into `main` via **PR #5**
+(`53ccf31`, 2026-07-25T23:19Z) — the rule-3 deploy-adjacent action, taken by the
+human; the run did not merge, push, or deploy. Release Manager decision:
+**Tier 2 · GO** (`runs/llm-summary/07-release-checklist.md`) — all gates pass or
+n/a-with-reason, rule-5 approval verified and scope-matched (shipped diff =
+deterministic-first + throwing placeholder only; no real model / network / keys),
+rollback confirmed executable. Post-launch handoff done: the token-SLO
+carry-forward was actioned (per-stage re-baseline, see the Trace note above). The seven
 rule-5 preconditions (carried into `07`) gate the future real-model slice:
 free-text invention guard, golden set + refresh cadence, cost kill-switch,
 rule-6 subprocessor/data-flow review + vendor risk, audit-ordering revisit,
