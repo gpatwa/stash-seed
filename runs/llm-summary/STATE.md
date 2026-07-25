@@ -4,7 +4,7 @@
 - **Project pack:** b2c-saas (with AI overlay roles)
 - **Release tier:** 2 (deterministic-first build; real model would be Tier 3)
 - **Current stage:** Release
-- **Status:** in-progress
+- **Status:** in-progress — awaiting human merge
 - **Started:** 2026-07-24T00:00Z  ·  **Updated:** 2026-07-24T18:43Z
 
 ## Stages
@@ -18,7 +18,7 @@
 | Cost | FinOps | done | runs/llm-summary/04-cost-budget.md | $0 live · pass |
 | QA | QA Evidence | done | runs/llm-summary/05-qa-evidence.md | 49/49 · pass |
 | Security | Security & Privacy | done | runs/llm-summary/06-security-review.md | PASS · go |
-| Release | Release Manager | pending | — | — |
+| Release | Release Manager | done | runs/llm-summary/07-release-checklist.md | Tier 2 · GO |
 
 ## Approvals
 
@@ -54,17 +54,31 @@ Security / Release = opus (`.claude/protocols/MODEL_ROUTING.md`).
 | Cost (FinOps) | sonnet | 2026-07-24T18:15Z | 2026-07-24T18:21Z | 6:08 | 396,543 | 10 | 0 |
 | QA (QA Evidence) | sonnet | 2026-07-24T18:26Z | 2026-07-24T18:34Z | 8:07 | 126,396 | 42 | 0 |
 | Security (Security & Privacy) | opus | 2026-07-24T18:35Z | 2026-07-24T18:43Z | 5:07 | 81,234 | 18 | 0 |
+| Release (Release Manager) | opus | 2026-07-25T00:00Z | 2026-07-25T00:07Z | 5:30 | 94,179 | 20 | 0 |
+| **Total (6 spawned stages)** | 4 sonnet / 2 opus | | | ~41 min | **884,247** | 143 | 0 |
+
+**SLO check (`PIPELINE_SLOS.md`):** zero retries ✓; approval surfaced at
+intake ✓. **Token budget MISSED — 884k vs the Tier-2 ≤250k target.** But this
+Tier-2 *product* change engaged three AI overlay roles (AI Engineer + AI
+Governance + FinOps) on top of the standard chain — 6 spawned stages, far
+more than a typical Tier-2. FinOps alone was 396k (45% of the total), a heavy
+outlier for a cost-model doc. Carry-forward: per-slice token budgets don't
+account for overlay-role count (a slice's cost scales with stages, not just
+risk tier) — re-baseline with an overlay-adjusted budget, and investigate the
+FinOps stage's token use. No silent loosening. (The run also survived an
+account usage-limit interruption mid-chain and resumed cleanly from this
+file — an incidental validation of the resumable-state machinery.)
 
 ## Next action
 
-Release Manager: read `runs/llm-summary/06-security-review.md` (Security:
-PASS — go; no blocker/required-fix; invariants 4, 5, 6 confirmed; concurs
-with audit-only-on-success as correct for a READ). Verify
-`APPROVAL_RECORD-1.md` (rule-5 scope = throwing placeholder seam only)
-against the shipped diff `9c96bdd` — Security already independently
-confirmed no real model / network / keys / new dependency. Ship at Tier 2.
-Carry the seven rule-5 preconditions from `06` forward as the gate for the
-future real-model slice (free-text invention guard, golden set + refresh
-cadence, cost kill-switch, rule-6 subprocessor/data-flow review + vendor
-risk, audit-ordering revisit, prompt-injection hardening, fresh rule-5
-approval + re-tier).
+**Human merges branch `slice/llm-summary` into `main` via PR** — this is the
+rule-3 deploy-adjacent action and stays with the human; the run does not merge,
+push, or deploy. Release Manager decision: **Tier 2 · GO**
+(`runs/llm-summary/07-release-checklist.md`) — all gates pass or n/a-with-reason,
+rule-5 approval verified and scope-matched (shipped diff = deterministic-first +
+throwing placeholder only; no real model / network / keys), rollback confirmed
+executable. On merge, hand off to the Post-Launch Learning Agent. The seven
+rule-5 preconditions (carried into `07`) gate the future real-model slice:
+free-text invention guard, golden set + refresh cadence, cost kill-switch,
+rule-6 subprocessor/data-flow review + vendor risk, audit-ordering revisit,
+prompt-injection hardening, fresh rule-5 approval + re-tier.
