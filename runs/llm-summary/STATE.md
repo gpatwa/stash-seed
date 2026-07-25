@@ -3,9 +3,9 @@
 - **Ask:** Give users an AI-generated summary of their saved items.
 - **Project pack:** b2c-saas (with AI overlay roles)
 - **Release tier:** 2 (deterministic-first build; real model would be Tier 3)
-- **Current stage:** Security
+- **Current stage:** Release
 - **Status:** in-progress
-- **Started:** 2026-07-24T00:00Z  ·  **Updated:** 2026-07-24T18:25Z
+- **Started:** 2026-07-24T00:00Z  ·  **Updated:** 2026-07-24T18:43Z
 
 ## Stages
 
@@ -17,7 +17,7 @@
 | AI risk | AI Governance | done | runs/llm-summary/03-ai-risk.md | Minimal · pass |
 | Cost | FinOps | done | runs/llm-summary/04-cost-budget.md | $0 live · pass |
 | QA | QA Evidence | done | runs/llm-summary/05-qa-evidence.md | 49/49 · pass |
-| Security | Security & Privacy | pending | — | — |
+| Security | Security & Privacy | done | runs/llm-summary/06-security-review.md | PASS · go |
 | Release | Release Manager | pending | — | — |
 
 ## Approvals
@@ -53,17 +53,18 @@ Security / Release = opus (`.claude/protocols/MODEL_ROUTING.md`).
 | AI risk (AI Governance) | sonnet | 2026-07-24T18:15Z | 2026-07-24T18:20Z | 4:30 | 68,648 | 7 | 0 |
 | Cost (FinOps) | sonnet | 2026-07-24T18:15Z | 2026-07-24T18:21Z | 6:08 | 396,543 | 10 | 0 |
 | QA (QA Evidence) | sonnet | 2026-07-24T18:26Z | 2026-07-24T18:34Z | 8:07 | 126,396 | 42 | 0 |
+| Security (Security & Privacy) | opus | 2026-07-24T18:35Z | 2026-07-24T18:43Z | 5:07 | 81,234 | 18 | 0 |
 
 ## Next action
 
-Security & Privacy: read `runs/llm-summary/05-qa-evidence.md` (QA: PASS —
-49/49 tests + 21/21 runtime-probe assertions) and `03-ai-risk.md`. Confirm no
-secret/PII leak, no approval bypass, and that invariants 4 (no content in
-logs), 5 (user-scoping), and the newly-codified 6 (AI/LLM adapters throw;
-no-invention) hold. Resolution of QA's flag: the intake artefacts referenced
-an "invariant 7" imported in error from the worked example's 7-invariant
-list; the LLM-adapter discipline was real (AI Engineer brief + rule 5) but
-uncodified in this repo — it is now added to `.agentic/SAFETY_INVARIANTS.md`
-as invariant 6. Concur (or not) on the audit-ordering: `items.summarized` is
-audited only-on-success, appropriate here because a summary is a READ, not a
-send (unlike `digest.js`'s attempt-before-send). Then hand to Release.
+Release Manager: read `runs/llm-summary/06-security-review.md` (Security:
+PASS — go; no blocker/required-fix; invariants 4, 5, 6 confirmed; concurs
+with audit-only-on-success as correct for a READ). Verify
+`APPROVAL_RECORD-1.md` (rule-5 scope = throwing placeholder seam only)
+against the shipped diff `9c96bdd` — Security already independently
+confirmed no real model / network / keys / new dependency. Ship at Tier 2.
+Carry the seven rule-5 preconditions from `06` forward as the gate for the
+future real-model slice (free-text invention guard, golden set + refresh
+cadence, cost kill-switch, rule-6 subprocessor/data-flow review + vendor
+risk, audit-ordering revisit, prompt-injection hardening, fresh rule-5
+approval + re-tier).
