@@ -15,3 +15,8 @@ explicit human approval.
    counts — never the saved content.
 5. **A user only ever affects their own items.** Every operation is scoped
    by `userId`; another user's IDs are rejected, never deleted.
+6. **AI / LLM adapters throw by default.** Any AI capability ships with a
+   placeholder adapter that throws; no live model call enters the build
+   without approval (wiring a real model is `HUMAN_APPROVAL_RULES` rule 5).
+   AI-generated user-facing text is deterministic-first and never invents
+   items, counts, or content the user doesn't have.
