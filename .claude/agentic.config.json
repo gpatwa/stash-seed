@@ -1,7 +1,7 @@
 {
   "packVersion": 2,
   "playbookPath": "../agentic-sdlc-playbook",
-  "generatedAt": "2026-07-25T23:25:05.147Z",
+  "generatedAt": "2026-07-26T00:04:00.249Z",
   "agentCount": 24,
   "defaults": {
     "stageWallClockMinutes": 20,
