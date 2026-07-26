@@ -1,0 +1,17 @@
+{
+  "schema": "agentic-sdlc/trace@1",
+  "slice": "email-digest",
+  "tier": 3,
+  "overlay": false,
+  "landed": true,
+  "started": "2026-07-13T06:04Z",
+  "stages": [
+    { "stage": "Scope",          "model": "sonnet", "tokens": 74191,  "toolCalls": 17, "retries": 0 },
+    { "stage": "Architecture",   "model": "opus",   "tokens": 83434,  "toolCalls": 25, "retries": 0 },
+    { "stage": "Implementation", "model": "sonnet", "tokens": 92740,  "toolCalls": 30, "retries": 0 },
+    { "stage": "QA",             "model": "sonnet", "tokens": 95907,  "toolCalls": 36, "retries": 0 },
+    { "stage": "Security",       "model": "opus",   "tokens": 70034,  "toolCalls": 17, "retries": 0 },
+    { "stage": "Release",        "model": "opus",   "tokens": 88046,  "toolCalls": 18, "retries": 0 },
+    { "stage": "Post-Launch",    "model": "sonnet", "tokens": 124794, "toolCalls": 31, "retries": 0 }
+  ]
+}
