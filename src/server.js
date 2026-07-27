@@ -106,9 +106,16 @@ export function createStashServer() {
 }
 
 // Start only when run directly (safe to import for tests / build check).
+// Bind LOOPBACK EXPLICITLY. `listen(port)` with no host binds 0.0.0.0 — every
+// interface — which put this unauthenticated surface on the LAN: any host could
+// read or bulk-delete another user's items with a self-asserted `userId`. This
+// seed has no auth, so unreachability IS the security control. Do not remove the
+// host argument. (Found by Security on streak-seed's equivalent slice; this repo
+// was the origin of the pattern.)
+export const LISTEN_HOST = "127.0.0.1";
 if (import.meta.url === `file://${process.argv[1]}`) {
   const port = Number(process.env.PORT) || 3000;
-  createStashServer().listen(port, () => {
-    process.stdout.write(`stash-seed listening on :${port}\n`);
+  createStashServer().listen(port, LISTEN_HOST, () => {
+    process.stdout.write(`stash-seed listening on ${LISTEN_HOST}:${port}\n`);
   });
 }

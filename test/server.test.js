@@ -3,6 +3,9 @@ import assert from "node:assert/strict";
 import { createStashServer } from "../src/server.js";
 import { _reset as resetItems } from "../src/services/savedItems.js";
 import { _reset as resetAudit } from "../src/services/audit.js";
+import { spawn } from "node:child_process";
+import { readFile } from "node:fs/promises";
+import { networkInterfaces } from "node:os";
 
 let server;
 let base;
@@ -78,4 +81,51 @@ test("missing userId -> 400", async () => {
 test("invalid JSON body -> 400, no crash", async () => {
   const res = await fetch(`${base}/items`, { method: "POST", body: "{not json" });
   assert.equal(res.status, 400);
+});
+
+// ── bind surface ───────────────────────────────────────────────────────────
+// Regression guard: the entry point must bind loopback only. This seed has no
+// auth, so unreachability is the security control — a wildcard bind put
+// user-scoped read + bulk-delete on the LAN. Two layers: a structural pin on the
+// source, and a live check against the real process.
+
+test("entry point pins loopback: LISTEN_HOST is 127.0.0.1 and listen() passes a host", async () => {
+  const { LISTEN_HOST } = await import("../src/server.js");
+  assert.equal(LISTEN_HOST, "127.0.0.1");
+  const src = await readFile(new URL("../src/server.js", import.meta.url), "utf8");
+  assert.match(
+    src,
+    /\.listen\(\s*port\s*,\s*LISTEN_HOST\s*,/,
+    "listen() must receive an explicit host — listen(port, cb) binds 0.0.0.0",
+  );
+});
+
+test("running server binds loopback, not the wildcard address", async () => {
+  const port = 45699;
+  const child = spawn(process.execPath, ["src/server.js"], {
+    cwd: new URL("..", import.meta.url).pathname,
+    env: { ...process.env, PORT: String(port) },
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  try {
+    await new Promise((resolve, reject) => {
+      child.stdout.on("data", (d) => String(d).includes("listening") && resolve());
+      child.on("error", reject);
+      setTimeout(() => reject(new Error("server did not start")), 5000);
+    });
+    // loopback is served
+    assert.equal((await fetch(`http://127.0.0.1:${port}/health`)).status, 200);
+    // a non-loopback local address is NOT served
+    const lan = Object.values(networkInterfaces())
+      .flat()
+      .find((i) => i && i.family === "IPv4" && !i.internal)?.address;
+    if (lan) {
+      await assert.rejects(
+        () => fetch(`http://${lan}:${port}/health`, { signal: AbortSignal.timeout(2000) }),
+        "a non-loopback address must not be served",
+      );
+    }
+  } finally {
+    child.kill();
+  }
 });
