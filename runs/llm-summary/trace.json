@@ -6,11 +6,50 @@
   "landed": true,
   "started": "2026-07-24T00:00Z",
   "stages": [
-    { "stage": "AI Engineer",   "model": "sonnet", "tokens": 117247, "toolCalls": 46, "retries": 0 },
-    { "stage": "AI Governance", "model": "sonnet", "tokens": 68648,  "toolCalls": 7,  "retries": 0 },
-    { "stage": "FinOps",        "model": "sonnet", "tokens": 396543, "toolCalls": 10, "retries": 0 },
-    { "stage": "QA",            "model": "sonnet", "tokens": 126396, "toolCalls": 42, "retries": 0 },
-    { "stage": "Security",      "model": "opus",   "tokens": 81234,  "toolCalls": 18, "retries": 0 },
-    { "stage": "Release",       "model": "opus",   "tokens": 94179,  "toolCalls": 20, "retries": 0 }
-  ]
+    {
+      "stage": "AI Engineer",
+      "model": "sonnet",
+      "tokens": 117247,
+      "toolCalls": 46,
+      "retries": 0
+    },
+    {
+      "stage": "AI Governance",
+      "model": "sonnet",
+      "tokens": 68648,
+      "toolCalls": 7,
+      "retries": 0
+    },
+    {
+      "stage": "FinOps",
+      "model": "sonnet",
+      "tokens": 396543,
+      "toolCalls": 10,
+      "retries": 0
+    },
+    {
+      "stage": "QA",
+      "model": "sonnet",
+      "tokens": 126396,
+      "toolCalls": 42,
+      "retries": 0
+    },
+    {
+      "stage": "Security",
+      "model": "opus",
+      "tokens": 81234,
+      "toolCalls": 18,
+      "retries": 0
+    },
+    {
+      "stage": "Release",
+      "model": "opus",
+      "tokens": 94179,
+      "toolCalls": 20,
+      "retries": 0
+    }
+  ],
+  "landedAt": "2026-07-25T23:19Z",
+  "postLandingFixes": 0,
+  "reverted": false
 }

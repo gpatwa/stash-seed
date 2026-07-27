@@ -1,6 +1,6 @@
 # Pipeline Analytics — generated
 
-_Generated 2026-07-26T18:39:56Z. **Do not edit by hand** — regenerate with `node <playbook>/execution/analyze.mjs .` from the repo root._
+_Generated 2026-07-27T06:26:14Z. **Do not edit by hand** — regenerate with `node <playbook>/execution/analyze.mjs .` from the repo root._
 
 ## Fleet
 
@@ -14,6 +14,22 @@ _Generated 2026-07-26T18:39:56Z. **Do not edit by hand** — regenerate with `no
 |-----|------|--------|--------|-------|----------|--------|
 | email-digest | 3 | 7 | 629,146 | 174 | 700,000 | ✅ pass |
 | llm-summary | 2+overlay | 6 | 884,247 | 143 | 600,000 | ❌ over 284k |
+
+## DORA
+
+Per `PIPELINE_SLOS.md` § DORA mapping. **Only metrics the traces ground are reported** — anything without data says so.
+
+| Metric | Value | Basis |
+|--------|-------|-------|
+| Lead time (median) | 2.0d | intake → landed, 2/2 slices dated |
+| Deployment frequency | 1.1 slices/week | 2 landed over the traced span |
+| Change failure rate | 0% | 0 post-landing fixes + 0 reverts ÷ 2 landed |
+| Rework rate | 0.00 / slice | 0 stage retries + 0 post-landing fixes ÷ 2 landed |
+| Failed-deployment recovery time | **not captured** | needs blocked→unblocked timestamps in `STATE.md`; no run has recorded them |
+
+> **Change failure and rework cover traced slices only.** 4 pre-telemetry run(s) are invisible here, so a defect shipped by one of them — and fixed later — is not counted. These rates are a floor, not a ceiling.
+
+Per-slice lead time: email-digest 0.8h · llm-summary 2.0d
 
 ## Density by archetype
 
