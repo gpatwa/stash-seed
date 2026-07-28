@@ -1,6 +1,6 @@
 # Pipeline Analytics — generated
 
-_Generated 2026-07-27T06:26:14Z. **Do not edit by hand** — regenerate with `node <playbook>/execution/analyze.mjs .` from the repo root._
+_Generated 2026-07-27T23:55:51Z. **Do not edit by hand** — regenerate with `node <playbook>/execution/analyze.mjs .` from the repo root._
 
 ## Fleet
 
@@ -43,21 +43,21 @@ Tokens per tool call, measured against each archetype's own cap.
 
 ## Per stage
 
-| Run | Stage | Type | Model | Tokens | Calls | Tok/call | % of cap | Flags |
-|-----|-------|------|-------|--------|-------|----------|----------|-------|
-| email-digest | Scope | review | sonnet | 74,191 | 17 | 4,364 | 55% | — |
-| email-digest | Architecture | review | opus | 83,434 | 25 | 3,337 | 42% | — |
-| email-digest | Implementation | build | sonnet | 92,740 | 30 | 3,091 | 62% | — |
-| email-digest | QA | build | sonnet | 95,907 | 36 | 2,664 | 53% | — |
-| email-digest | Security | review | opus | 70,034 | 17 | 4,120 | 52% | — |
-| email-digest | Release | review | opus | 88,046 | 18 | 4,891 | 61% | — |
-| email-digest | Post-Launch | review | sonnet | 124,794 | 31 | 4,026 | 50% | — |
-| llm-summary | AI Engineer | build | sonnet | 117,247 | 46 | 2,549 | 51% | — |
-| llm-summary | AI Governance | design | sonnet | 68,648 | 7 | 9,807 | 65% | — |
-| llm-summary | FinOps | design | sonnet | 396,543 | 10 | 39,654 | 264% | ⚠ over cap, ⚠ density |
-| llm-summary | QA | build | sonnet | 126,396 | 42 | 3,009 | 60% | — |
-| llm-summary | Security | review | opus | 81,234 | 18 | 4,513 | 56% | — |
-| llm-summary | Release | review | opus | 94,179 | 20 | 4,709 | 59% | — |
+| Run | Stage | Type | Model | Effort | Tokens | Calls | Tok/call | % of cap | Flags |
+|-----|-------|------|-------|--------|--------|-------|----------|----------|-------|
+| email-digest | Scope | review | sonnet | — | 74,191 | 17 | 4,364 | 55% | — |
+| email-digest | Architecture | review | opus | — | 83,434 | 25 | 3,337 | 42% | — |
+| email-digest | Implementation | build | sonnet | — | 92,740 | 30 | 3,091 | 62% | — |
+| email-digest | QA | build | sonnet | — | 95,907 | 36 | 2,664 | 53% | — |
+| email-digest | Security | review | opus | — | 70,034 | 17 | 4,120 | 52% | — |
+| email-digest | Release | review | opus | — | 88,046 | 18 | 4,891 | 61% | — |
+| email-digest | Post-Launch | review | sonnet | — | 124,794 | 31 | 4,026 | 50% | — |
+| llm-summary | AI Engineer | build | sonnet | — | 117,247 | 46 | 2,549 | 51% | — |
+| llm-summary | AI Governance | design | sonnet | — | 68,648 | 7 | 9,807 | 65% | — |
+| llm-summary | FinOps | design | sonnet | — | 396,543 | 10 | 39,654 | 264% | ⚠ over cap, ⚠ density |
+| llm-summary | QA | build | sonnet | — | 126,396 | 42 | 3,009 | 60% | — |
+| llm-summary | Security | review | opus | — | 81,234 | 18 | 4,513 | 56% | — |
+| llm-summary | Release | review | opus | — | 94,179 | 20 | 4,709 | 59% | — |
 
 ## Outliers
 
