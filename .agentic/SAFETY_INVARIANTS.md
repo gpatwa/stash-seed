@@ -20,3 +20,18 @@ explicit human approval.
    without approval (wiring a real model is `HUMAN_APPROVAL_RULES` rule 5).
    AI-generated user-facing text is deterministic-first and never invents
    items, counts, or content the user doesn't have.
+7. **The server is reachable only from the host it runs on.** The listener
+   binds `LISTEN_HOST = "127.0.0.1"` explicitly — never `0.0.0.0`, and never
+   a bare `listen(port)`, whose default is every interface. This is not a
+   deployment preference: there is **no authentication**, `userId` is a
+   self-asserted header, so invariant 5 holds only because nobody else can
+   reach the socket. Unreachability *is* the access control. Widening the
+   bind — or exposing the port by any other route — is a safety-control
+   change under `HUMAN_APPROVAL_RULES` rule 4, and requires human approval
+   **and** real authentication landing in the same slice, never as a
+   follow-up. Recorded because the sibling reference app shipped exactly this
+   defect — `streak-seed`'s `http-layer` review raised a wildcard bind as a
+   release blocker (BIND-1) after reaching a user's data over the LAN. This
+   server was audited and corrected off the back of that finding, **not** by
+   a gate of its own: no stash-seed run caught it, which is precisely why the
+   control belongs here rather than only in a code comment.
