@@ -1,6 +1,6 @@
 # Pipeline Analytics — generated
 
-_Generated 2026-07-27T23:55:51Z. **Do not edit by hand** — regenerate with `node <playbook>/execution/analyze.mjs .` from the repo root._
+_Generated 2026-08-08T06:39:56Z. **Do not edit by hand** — regenerate with `node <playbook>/execution/analyze.mjs .` from the repo root._
 
 ## Fleet
 
@@ -58,6 +58,10 @@ Tokens per tool call, measured against each archetype's own cap.
 | llm-summary | QA | build | sonnet | — | 126,396 | 42 | 3,009 | 60% | — |
 | llm-summary | Security | review | opus | — | 81,234 | 18 | 4,513 | 56% | — |
 | llm-summary | Release | review | opus | — | 94,179 | 20 | 4,709 | 59% | — |
+
+## Untraced stages
+
+None — every stage in every run reported its own telemetry.
 
 ## Outliers
 
