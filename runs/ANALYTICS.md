@@ -1,6 +1,6 @@
 # Pipeline Analytics — generated
 
-_Generated 2026-08-08T06:39:56Z. **Do not edit by hand** — regenerate with `node <playbook>/execution/analyze.mjs .` from the repo root._
+_Generated 2026-08-22T18:38:40Z. **Do not edit by hand** — regenerate with `node <playbook>/execution/analyze.mjs .` from the repo root._
 
 ## Fleet
 
@@ -62,6 +62,13 @@ Tokens per tool call, measured against each archetype's own cap.
 ## Untraced stages
 
 None — every stage in every run reported its own telemetry.
+
+## Gate catches
+
+Defects the gates caught before they shipped — the pipeline earning its keep.
+**A floor, not a total:** 2 run(s) predate the `gateCatches` field (email-digest, llm-summary) and recorded catches only in prose, so a real block — e.g. Security stopping the http-layer bind — is not counted here.
+
+None structurally recorded yet.
 
 ## Outliers
 
