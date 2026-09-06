@@ -202,3 +202,91 @@ All green.
 Next: QA Evidence Agent, per `runs/saved-item-folders/STATE.md`. No open
 implementation questions — Decisions 3 and 4 remain flagged (by the
 Architect) for Security to confirm, not for this stage to resolve.
+
+---
+
+## Rework — Security round 1
+
+> Source: `runs/saved-item-folders/05-security-review.md` (Security & Privacy
+> Agent, verdict GO conditional on SEC-1 and SEC-2). SEC-3 and the six
+> advisories are out of scope for this rework (SEC-3 is an EM/human rule-4
+> approval item; advisories are recorded for a future slice).
+
+### SEC-1 — `clearFolderFromItems` userId clause had zero test coverage
+
+Added one test to `test/savedItems.test.js` (new case, imports
+`clearFolderFromItems`): two users each hold an item whose `folderId` is the
+same string (`"fld_1"`, set directly via the unaudited `setItemFolder`
+mechanic to reproduce a folder-id collision across users — the exact scenario
+Security's scratch-mutation proof used). `clearFolderFromItems("u1",
+"fld_1")` must clear only u1's item and leave u2's item's `folderId` intact.
+
+**Fail-first evidence:** removed the `item.userId === userId` clause from
+`clearFolderFromItems` (`src/services/savedItems.js:121`, changing the guard
+to `if (item.folderId === folderId)`), leaving the new test in place.
+`node --test test/savedItems.test.js` → **19 pass, 1 fail**, real failure:
+
+```
+✖ clearFolderFromItems does not clear another user's item sharing the same folderId
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+    [
+      'item_1',
+  +   'item_2'
+    ]
+  actual: [ 'item_1', 'item_2' ], expected: [ 'item_1' ]
+```
+
+u2's item (`item_2`) was swept in exactly as Security's proof predicted.
+Restored the clause; `node --test test/savedItems.test.js` → **20 pass, 0
+fail**.
+
+### SEC-2 — "invariant 4" test didn't assert the folder name was absent
+
+Added `assert.ok(!serialized.includes("Secret Folder Name"), ...)` inside the
+existing loop in `test/folders.test.js`'s `invariant 4 — no content in audit`
+test, mirroring the pre-existing item-content assertion.
+
+**Fail-first evidence:** temporarily changed `createFolder`'s audit call
+(`src/services/folders.js:27`) to `recordAuditEvent(userId, "folders.created",
+{ folderId, label: name })`, leaving the fixed test in place.
+`node --test test/folders.test.js` → **2 failures** (the pre-existing
+`audit shape — create` deep-equal test, as expected/unrelated, plus the
+target test with the new assertion):
+
+```
+test at test/folders.test.js:223:1
+✖ invariant 4 — no content in audit (0.120208ms)
+  AssertionError [ERR_ASSERTION]: folder name string must not appear anywhere in audit metadata
+  actual: false, expected: true
+```
+
+This is exactly the failure SEC-2 asked for: the fixed test now catches the
+leak on its own, not incidentally via the unrelated shape test. Restored
+`folders.js`; `node --test test/folders.test.js` → **18 pass, 0 fail**.
+
+### Full-suite confirmation
+
+After restoring both files: `npm test` → **77 pass, 0 fail** (76 baseline +
+1 new SEC-1 test; SEC-2 modified an existing test, no count change from it).
+`npm run typecheck` → `typecheck ok`. `npm run build` → `build ok`.
+`npm run qa:mvp` → typecheck ok, 77 pass, 0 fail.
+
+`git status` confirms `src/` is unmodified — both fail-first mutations were
+made and reverted in place on tracked files, verified back to their
+committed content before running the full suite or committing.
+
+### Commit
+
+- **Files committed:** `test/savedItems.test.js`, `test/folders.test.js`.
+  No `src/` changes (both fixes are test-only and additive, as Security
+  required).
+- **Commit hash:** `b3ec7c154faee955d257bbbbb036dd45c11a7a2d`
+- **Not committed:** the same pre-existing out-of-scope working-tree changes
+  noted in the original Implementation stage above, still untouched.
+
+### Handoff
+
+Next: Release Manager, per Security's hand-off. SEC-3 remains routed
+separately to EM → Orchestrator → human as a rule-4 approval request and does
+not gate this release.

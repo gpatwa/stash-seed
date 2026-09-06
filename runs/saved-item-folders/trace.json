@@ -1,0 +1,140 @@
+{
+  "schema": "agentic-sdlc/trace@2",
+  "slice": "saved-item-folders",
+  "tier": 2,
+  "overlay": false,
+  "landed": true,
+  "started": "2026-09-06T02:03Z",
+  "landedAt": "2026-09-06T07:17Z",
+  "operator": "gpatwa",
+  "postLandingFixes": 0,
+  "reverted": false,
+  "gateCatches": [
+    {
+      "gate": "Security",
+      "verdict": "fail",
+      "severity": "required-fix",
+      "finding": "SEC-1: clearFolderFromItems's userId-ownership clause had zero test coverage (proven by live mutation: removing it left the 76-test suite green while nulling another user's folderId). SEC-2: the 'invariant 4 \u2014 no content in audit' test only checked deep-equal shape, so a leaked folder name would have passed it (proven by live mutation of the audit call). Both were suite gaps, not shipped defects \u2014 verified correct at all enforcement points before and after the fix.",
+      "detectedAt": "2026-09-06T02:42Z",
+      "resolvedAt": "2026-09-06T02:50Z"
+    }
+  ],
+  "stages": [
+    {
+      "stage": "Intake",
+      "executor": "orchestrator",
+      "retries": 0
+    },
+    {
+      "stage": "Scope Review",
+      "executor": "subagent",
+      "archetype": "review",
+      "model": "opus",
+      "effort": "medium",
+      "tokens": 82518,
+      "toolCalls": 20,
+      "retries": 0
+    },
+    {
+      "stage": "Architecture",
+      "executor": "subagent",
+      "archetype": "review",
+      "model": "opus",
+      "effort": "high",
+      "tokens": 96407,
+      "toolCalls": 17,
+      "retries": 0
+    },
+    {
+      "stage": "Implementation",
+      "executor": "subagent",
+      "archetype": "build",
+      "model": "sonnet",
+      "effort": "medium",
+      "tokens": 108611,
+      "toolCalls": 33,
+      "retries": 0
+    },
+    {
+      "stage": "QA Evidence",
+      "executor": "subagent",
+      "archetype": "build",
+      "model": "sonnet",
+      "effort": "high",
+      "tokens": 105620,
+      "toolCalls": 31,
+      "retries": 0
+    },
+    {
+      "stage": "Security Review",
+      "executor": "subagent",
+      "archetype": "review",
+      "model": "opus",
+      "effort": "high",
+      "tokens": 111157,
+      "toolCalls": 32,
+      "retries": 0
+    },
+    {
+      "stage": "Implementation rework",
+      "executor": "subagent",
+      "archetype": "build",
+      "model": "sonnet",
+      "effort": "medium",
+      "tokens": 93651,
+      "toolCalls": 31,
+      "retries": 1
+    },
+    {
+      "stage": "Security re-verify",
+      "executor": "subagent",
+      "archetype": "review",
+      "model": "opus",
+      "effort": "high",
+      "tokens": 79104,
+      "toolCalls": 21,
+      "retries": 0
+    },
+    {
+      "stage": "Release Gate",
+      "executor": "subagent",
+      "archetype": "review",
+      "model": "sonnet",
+      "effort": "high",
+      "tokens": 140994,
+      "toolCalls": 27,
+      "retries": 0
+    },
+    {
+      "stage": "Post-Launch",
+      "executor": "subagent",
+      "retries": 0,
+      "archetype": "review",
+      "model": "sonnet",
+      "effort": "medium",
+      "tokens": 128600,
+      "toolCalls": 16
+    }
+  ],
+  "notes": {
+    "budget": 400000,
+    "spent": 946662,
+    "overrunAuthorizedBy": null,
+    "overrunReason": "The 400k budget was set before Security's required-fix/rework/re-verify cycle existed as a known cost (that alone added ~284k across 3 extra stage-attempts: Security Review 111,157 + Implementation rework 93,651 + Security re-verify 79,104). The remaining overage is that every stage individually ran heavier than the per-stage estimates used to set the budget, not one runaway stage \u2014 the fleet's own archetype baselines (PIPELINE_SLOS.md) will need re-checking against this run once analyze.mjs regenerates.",
+    "recordedAs": "UNAUTHORIZED overrun \u2014 surfaced to the operator mid-run (before Security Review, at 98% spent) with real numbers; the operator chose to proceed based on real usage-window headroom (35% of 5hr session, confirmed via /usage), not by raising the token budget to fit the spend. The 400k budget stands.",
+    "leastPrivilegeEnforced": false,
+    "leastPrivilegeNote": "Orchestrator session rooted in agentic-sdlc-playbook, not in stash-seed \u2014 .claude/agents/ generated in stash-seed was not discoverable from that session root, so every stage was spawned as a general-purpose agent with its role brief inlined and full tools, not the generated least-privilege tools: frontmatter. Decided and confirmed with the operator before the run started, per CLAUDE.md's own rule against silently proceeding as if enforcement held.",
+    "modelRoutingDivergence": "Scope Review ran on opus (82,518 tokens), not MODEL_ROUTING.md's static default for Engineering Manager (sonnet, medium effort). This was an unprincipled choice by the Orchestrator, not a deliberate escalation \u2014 recorded per MODEL_ROUTING.md's own rule against silent divergence. No other stage diverged from its static default.",
+    "release": {
+      "prUrl": "https://github.com/gpatwa/stash-seed/pull/6",
+      "mergeCommit": "3e8ede525a6472f7be5f42b412c7fc7534c52f65",
+      "ciCheckConfirmed": true,
+      "branchProtectionConfirmedLive": "PR was mergeStateStatus=BLOCKED until the required 'Release gates' check went pass (19s) \u2014 first real end-to-end confirmation that T4's branch protection actually blocks a merge, not just that the setting exists."
+    },
+    "codeCommitted": true,
+    "codePushed": true,
+    "codeMerged": true,
+    "runArtefactsCommitted": false,
+    "runArtefactsCommitNote": "The code shipped for real (PR #6, merged). The run's own documentation artefacts (this file, STATE.md, 00 through 06) are left uncommitted in stash-seed for the operator's own review before they enter history \u2014 same deliberate pattern as the T1 security-hardening run, distinct from whether the feature itself shipped."
+  }
+}
