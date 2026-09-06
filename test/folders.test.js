@@ -231,6 +231,10 @@ test("invariant 4 — no content in audit", () => {
   for (const e of events) {
     const serialized = JSON.stringify(e.metadata);
     assert.ok(!serialized.includes("secret item content"));
+    assert.ok(
+      !serialized.includes("Secret Folder Name"),
+      "folder name string must not appear anywhere in audit metadata",
+    );
     assert.ok(!("name" in e.metadata), "metadata must not carry a name key");
   }
 });

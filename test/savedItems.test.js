@@ -6,6 +6,7 @@ import {
   softDeleteItem,
   bulkDeleteItems,
   setItemFolder,
+  clearFolderFromItems,
   _getItem,
   _reset as resetItems,
 } from "../src/services/savedItems.js";
@@ -295,4 +296,29 @@ test("setItemFolder refuses a soft-deleted item", () => {
 
   assert.equal(result, false);
   assert.equal(_getItem(id).folderId, null);
+});
+
+// Case 26: clearFolderFromItems is user-scoped (SEC-1) — the sweep must not
+// null folderId on another user's item, even when that item happens to carry
+// a folderId string matching the folder being cleared (folder ids come from
+// a global counter, so collisions across users are exactly the scenario the
+// userId clause exists to guard against).
+test("clearFolderFromItems does not clear another user's item sharing the same folderId", () => {
+  resetItems();
+  resetAudit();
+  const u1Item = addItem("u1", "u1 content");
+  const u2Item = addItem("u2", "u2 content");
+  const sharedFolderId = "fld_1"; // simulate a folderId collision between users
+  assert.equal(setItemFolder("u1", u1Item, sharedFolderId), true);
+  assert.equal(setItemFolder("u2", u2Item, sharedFolderId), true);
+
+  const cleared = clearFolderFromItems("u1", sharedFolderId);
+
+  assert.deepEqual(cleared, [u1Item]);
+  assert.equal(_getItem(u1Item).folderId, null);
+  assert.equal(
+    _getItem(u2Item).folderId,
+    sharedFolderId,
+    "u2's item must remain untouched by a sweep scoped to u1",
+  );
 });
