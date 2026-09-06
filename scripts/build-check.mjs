@@ -7,6 +7,7 @@ const modules = [
   "../src/services/emailAdapter.js",
   "../src/services/digest.js",
   "../src/services/summary.js",
+  "../src/services/folders.js",
   "../src/server.js",
 ];
 

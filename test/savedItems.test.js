@@ -5,6 +5,7 @@ import {
   listItems,
   softDeleteItem,
   bulkDeleteItems,
+  setItemFolder,
   _getItem,
   _reset as resetItems,
 } from "../src/services/savedItems.js";
@@ -207,4 +208,91 @@ test("bulkDeleteItems: single-item list behaves like softDeleteItem", () => {
   const types = events.map((e) => e.type);
   assert.ok(types.includes("items.deleted"));
   assert.ok(types.includes("items.bulk_deleted"));
+});
+
+// ── folders support (folderId field, options param, mechanics) ─────────────
+
+// Case 19: new items default to unfoldered
+test("new items default to unfoldered (folderId null, never undefined)", () => {
+  resetItems();
+  resetAudit();
+  const id = addItem("u1", "x");
+  assert.equal(_getItem(id).folderId, null);
+});
+
+// Case 20: listItems(userId) one-argument regression guard
+test("listItems(userId) one-argument regression guard returns all live items regardless of folder", () => {
+  resetItems();
+  resetAudit();
+  const a = addItem("u1", "unfoldered");
+  const b = addItem("u1", "foldered");
+  setItemFolder("u1", b, "fld_1");
+
+  const list = listItems("u1");
+  const ids = list.map((i) => i.itemId);
+  assert.equal(list.length, 2);
+  assert.ok(ids.includes(a));
+  assert.ok(ids.includes(b));
+});
+
+// Case 21: listItems(userId, {}) === listItems(userId)
+test("listItems(userId, {}) matches listItems(userId)", () => {
+  resetItems();
+  resetAudit();
+  addItem("u1", "a");
+  addItem("u1", "b");
+
+  const withoutOptions = listItems("u1").map((i) => i.itemId);
+  const withEmptyOptions = listItems("u1", {}).map((i) => i.itemId);
+  assert.deepEqual(withEmptyOptions, withoutOptions);
+});
+
+// Case 22: {folderId: null} returns only unfoldered items
+test("listItems(userId, {folderId: null}) returns only unfoldered items", () => {
+  resetItems();
+  resetAudit();
+  const unfoldered = addItem("u1", "unfoldered");
+  const foldered = addItem("u1", "foldered");
+  setItemFolder("u1", foldered, "fld_1");
+
+  const list = listItems("u1", { folderId: null });
+  assert.equal(list.length, 1);
+  assert.equal(list[0].itemId, unfoldered);
+});
+
+// Case 23: folder filter respects deletedAt
+test("folder filter respects deletedAt — soft-deleted item in a folder is excluded", () => {
+  resetItems();
+  resetAudit();
+  const id = addItem("u1", "x");
+  setItemFolder("u1", id, "fld_1");
+  softDeleteItem("u1", id);
+
+  const list = listItems("u1", { folderId: "fld_1" });
+  assert.equal(list.length, 0);
+});
+
+// Case 24: setItemFolder is user-scoped
+test("setItemFolder is user-scoped", () => {
+  resetItems();
+  resetAudit();
+  const id = addItem("u1", "x");
+
+  const result = setItemFolder("u2", id, "fld_1");
+
+  assert.equal(result, false);
+  assert.equal(_getItem(id).folderId, null);
+});
+
+// Case 25: setItemFolder refuses a soft-deleted item
+test("setItemFolder refuses a soft-deleted item", () => {
+  resetItems();
+  resetAudit();
+  const id = addItem("u1", "x");
+  softDeleteItem("u1", id);
+
+  const result = setItemFolder("u1", id, "fld_1");
+
+  assert.equal(result, false);
+  assert.equal(_getItem(id).folderId, null);
 });
